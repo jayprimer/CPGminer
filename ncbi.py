@@ -1,0 +1,242 @@
+import streamlit as st
+import pandas as pd
+import pprintpp as pp
+from ete3 import NCBITaxa
+import base64
+import re
+
+def change_ftp(ftp_path):
+    '''
+    function to change from ftp: to https: of the downloadable table
+    :param ftp_path: a string of the ftp path
+    :return:
+    '''
+    new_ftp_path = 'https' + ftp_path[3:]  
+    return new_ftp_path
+
+## download data
+@st.cache(allow_output_mutation=True)
+def download_link(object_to_download, download_filename, download_link_text):
+    """
+    Generates a link to download the given object_to_download.
+
+    object_to_download (str, pd.DataFrame):  The object to be downloaded.
+    download_filename (str): filename and extension of file. e.g. mydata.csv, some_txt_output.txt
+    download_link_text (str): Text to display for download link.
+
+    Examples:
+    download_link(YOUR_DF, 'YOUR_DF.csv', 'Click here to download data!')
+    download_link(YOUR_STRING, 'YOUR_STRING.txt', 'Click here to download your text!')
+
+    """
+    if isinstance(object_to_download,pd.DataFrame):
+        object_to_download = object_to_download.to_csv(index=False)
+
+    # some strings <-> bytes conversions necessary here
+    b64 = base64.b64encode(object_to_download.encode()).decode()
+
+    return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
+
+@st.cache(allow_output_mutation=True)    
+def count_tableMaker_groupby (Taxlank, genome_df):
+
+    '''
+    Function to make a dataframe of the count values of taxonomic groups of the selected genomes
+    argument: Taxlank
+    argument: final_genome_df 
+    '''
+    
+    if Taxlank == 'Phylum':
+        groupby_list = ['superkingdom','phylum']
+    elif Taxlank == 'Class':
+        groupby_list = ['superkingdom','phylum', 'class']
+    elif Taxlank == 'Order':
+        groupby_list = ['superkingdom','phylum', 'class', 'order']    
+    elif Taxlank == 'Family':
+        groupby_list = ['superkingdom','phylum', 'class', 'order', 'family']      
+    elif Taxlank == 'Genus':
+        groupby_list = ['superkingdom','phylum', 'class', 'order', 'family', 'genus'] 
+    elif Taxlank == 'Species':
+        groupby_list = ['superkingdom','phylum', 'class', 'order', 'family', 'genus', 'species'] 
+                    
+    Taxlank_series = genome_df.groupby(groupby_list).size()
+    Taxlank_df = Taxlank_series.to_frame()
+    Taxlank_df_reindex = Taxlank_df.reset_index()
+    Taxlank_df_final = Taxlank_df_reindex.rename(columns={0: 'Count'})
+    Taxlank_df_dsend = Taxlank_df_final.sort_values(by='Count', ascending=False)
+    Taxlank_df_dsend_reindex = Taxlank_df_dsend.reset_index(drop=True)
+    return Taxlank_df_dsend_reindex
+
+@st.cache(allow_output_mutation=True) 
+def get_desired_ranks(taxid, desired_ranks):
+    '''
+    function to get taxonomical information from taxID
+    :param taxid: e.g., 257
+    :param desired_ranks: taxonimical ranks
+    :return:
+    '''
+    ncbi = NCBITaxa()
+    count = 0   
+    lineage_list = [taxid]
+    try:
+        lineage = ncbi.get_lineage(taxid)
+        lineage2ranks = ncbi.get_rank(lineage)
+        ranks2lineage = dict((rank, taxid) for (taxid, rank) in lineage2ranks.items())
+        rank_dict = {'{}_id'.format(rank): ranks2lineage.get(rank, '<not present>') for rank in desired_ranks}
+                
+        for k, v in rank_dict.items():
+            if v != "<not present>":
+                try:
+                    new_v = ncbi.get_taxid_translator([v])  ## new_v is dictionary key=pylum_id, value=xxxxxx
+                    lineage_list.append(new_v[v])
+                except:
+                    pass
+            else: 
+                lineage_list.append("<not present>")
+            
+    except:
+        count = 1
+    return (lineage_list, count)
+
+@st.cache(allow_output_mutation=True)
+def taxID_lineage_df(taxids, desired_ranks):
+    '''
+    Function to make a taxonomical information dtatframe of taxids
+    :param taxids:
+    :param desired_ranks: superkingdom, phylum, class, order, family, genus, species
+    :return: lineage_df: a dataframe of taxids and their taxonomical information
+    '''
+
+    missed_taxID = 0
+    lineage_dict = {}   ## key=taxid, value=[lineage]
+    for i, taxid in enumerate(taxids):
+        (lineage_list, count) = get_desired_ranks(taxid, desired_ranks)
+        lineage_dict[i] = lineage_list
+        if count == 1:
+            missed_taxID +=1
+    
+    desired_ranks.insert(0, 'TaxID')
+    lineage_df = pd.DataFrame.from_dict(lineage_dict, orient='index', columns=desired_ranks)
+    return (lineage_df, missed_taxID)
+
+
+
+class NCBIdata:
+    def __init__(self):
+        self.url = "https://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS/prokaryotes.txt"
+        self.tax_item_texts = ['TaxID', 'superkingdom', 'phylum', 'class', 'order', 'family','genus', 'species']
+        self.column_names = ['#Organism/Name', 'TaxID', 'Size (Mb)', 'GC%', 'Replicons', 'Genes', 'Proteins', 'Release Date', 'Status', 'FTP Path']
+        
+        self.tax_items = {}
+        self.filters = {}
+
+    def load(self):
+        data = pd.read_table(self.url, usecols=self.column_names)  # the column 15: Status
+        print(data)
+        complete_genomes = data.loc[data['Status'] == "Complete Genome"]    # Select only complete genomes
+        genome_df = complete_genomes.reset_index(drop = True) # reset index from 0
+        genome_df = genome_df.drop(['Status'], axis = 1) # remove the column "Status"
+        genome_df = genome_df.rename(columns={"#Organism/Name": "Genome Name"}) # change the first column name
+        self.genome_df = genome_df
+        return self.genome_df
+
+    def load_old(self):
+        data = pd.read_table(self.url, usecols=self.column_names)  # the column 15: Status
+        print(data)
+        complete_genomes = data.loc[data['Status'] == "Complete Genome"]    # Select only complete genomes
+        genome_df = complete_genomes.reset_index(drop = True) # reset index from 0
+        genome_df = genome_df.drop(['Status'], axis = 1) # remove the column "Status"
+        genome_df = genome_df.rename(columns={"#Organism/Name": "Genome Name"}) # change the first column name
+    
+        
+        self.genome_df = self.count_chro_plas(genome_df)
+        self.genome_df = self.making_final_df(self.genome_df)
+        self.genome_df = self.genome_df.dropna()  # remove missing values
+
+        self.calc_tax_items()
+
+        return self.genome_df
+
+    def calc_tax_items(self):
+        for item_text in self.tax_item_texts:
+            self.tax_items[item_text] = list(set(self.genome_df[item_text]))
+            self.tax_items[item_text] = list(filter(None, self.tax_items[item_text]))
+            self.tax_items[item_text].sort()
+
+    def get_range(self, df, col_name):
+        min_value = float(df[col_name].min())
+        max_value = float(df[col_name].max())
+        return (min_value, max_value)
+
+    def count_chro_plas(self, genome_df):
+        '''
+        Function to update the final genome_df by adding two columns, i.e., No. of chromosome and No. of plasmid
+        :param genome_df:
+        :return: the updated genome_df
+        '''
+
+        replicons_list = list(genome_df['Replicons'])
+        chromosome_list = []
+        plasmid_list = []
+        word_chromosome = ['chromosome']
+        word_plasmid = ['plasmid']
+        exactMatch_chromosome = re.compile(r'\b%s\b' % '\\b|\\b'.join(word_chromosome), flags=re.IGNORECASE)
+        exactMatch_plasmid = re.compile(r'\b%s\b' % '\\b|\\b'.join(word_plasmid), flags=re.IGNORECASE)
+        for r in replicons_list:
+            no_chromosome = len(exactMatch_chromosome.findall(r))
+            chromosome_list.append(no_chromosome)
+            no_plasmid = len(exactMatch_plasmid.findall(r))
+            plasmid_list.append(no_plasmid)
+        
+        chr_plas_dic = {'Chromosome': chromosome_list, 'Plasmid': plasmid_list}
+        chr_plas_df = pd.DataFrame(chr_plas_dic)
+        genome_df = pd.concat([genome_df, chr_plas_df], axis=1)
+        
+        return genome_df
+    
+    def making_final_df(self, genome_df):
+        '''
+        Function to make a final genome_df from the genome_df by reordering of columns, changing datatypes, etc...
+        :param genome_df:
+        :return: final_genome_df
+        '''
+
+        columnsTitles = ['Genome Name', 'TaxID', 'Size (Mb)', 'GC%', 'Replicons', 'Chromosome', 'Plasmid', 'Genes', 'Proteins', 'Release Date', 'FTP Path']
+        genome_df = genome_df.reindex(columns=columnsTitles)
+        genome_df=genome_df.rename(columns = {'Size (Mb)':'Genome size (Mb)', 'FTP Path':'Genome download (FTP Path)'})
+        
+        taxID_list = list(set(genome_df['TaxID']))
+        ncbi = NCBITaxa()
+        desired_ranks = ['superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
+        lineage_df, missed_taxID = taxID_lineage_df(taxID_list, desired_ranks)
+        
+        ## Join of two dataframes
+        final_genome_df = pd.merge(genome_df, lineage_df, on='TaxID')
+        
+        ## ftp to https
+        final_genome_df['Genome download (FTP Path)'] = final_genome_df['Genome download (FTP Path)'].apply(change_ftp)  
+        
+        # OK_df = final_genome_df.style.format({'Genome download (FTP Path)': make_clickable})
+        
+        ## str to numeric data of the columns or number to str
+        final_genome_df['GC%'] = pd.to_numeric(final_genome_df['GC%'], errors='coerce') 
+        final_genome_df['Genes'] = pd.to_numeric(final_genome_df['Genes'], errors='coerce') 
+        final_genome_df['Proteins'] = pd.to_numeric(final_genome_df['Proteins'], errors='coerce')
+        final_genome_df['Chromosome'] = pd.to_numeric(final_genome_df['Chromosome'], errors='coerce')
+        final_genome_df['Plasmid'] = pd.to_numeric(final_genome_df['Plasmid'], errors='coerce')
+        final_genome_df['TaxID'] = final_genome_df['TaxID'].astype(str)
+
+        return final_genome_df
+
+    def setFilter(self, key, value):
+        self.filters[key] = value
+
+    def __repr__(self):
+        return pp.pformat(self.filters)
+
+    
+
+
+        
+        
+
