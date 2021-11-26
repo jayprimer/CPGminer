@@ -71,9 +71,9 @@ def initialize_data():
 
     return ncbi_data
 
-def display_filters(ncbi_df):
-    st.header('Selected Data')
-    for title, filter in ncbi_df.filters.items():
+def display_filters(ncbi_data):
+    st.header('Selected Complete Genomes')
+    for title, filter in ncbi_data.filters.items():
         if title == 'Taxonomic Ranks':
             if filter['values']: 
                 filter_menu = filter['menu']
@@ -82,6 +82,16 @@ def display_filters(ncbi_df):
         elif 'checked' in filter and filter['checked']:
             filter_values = str(filter['values'][0]) + ' - ' + str(filter['values'][1])
             st.markdown(f"**{filter['menu']}**: {filter_values}")
+    
+    st.dataframe(data=ncbi_data.filtered_df)
+        
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write(ncbi_data.filtered_df.shape[0], 'rows x', ncbi_data.filtered_df.shape[1], 'columns')
+    with col2:
+        tmp_download_link = download_link(ncbi_data.filtered_df, 'genome.csv', 'Download (csv)')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+    
 
 def analysis_num_submission(ncbi_df):
     ## Data 1:
@@ -282,14 +292,6 @@ def main():
 
     display_filters(ncbi_data)
 
-    st.dataframe(data=ncbi_data.filtered_df)
-        
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write(ncbi_data.filtered_df.shape[0], 'rows x', ncbi_data.filtered_df.shape[1], 'columns')
-    with col2:
-        tmp_download_link = download_link(ncbi_data.filtered_df, 'genome.csv', 'Download (csv)')
-        st.markdown(tmp_download_link, unsafe_allow_html=True)
         
 
     analysis_num_submission(ncbi_data.filtered_df)
