@@ -249,11 +249,12 @@ def analysis_section4(ncbi_df):
         st.write('Please select genome(s)')  
 
 def main():
-    ncbi_data = initialize_data()
-    ncbi_df = ncbi_data.genome_df
-
     st.image('./images/Picture7.png', use_column_width=True)
-    
+
+    with st.spinner('Downloading data from NCBI...'):
+        ncbi_data = initialize_data()
+        ncbi_df = ncbi_data.genome_df
+
     create_sidebar(ncbi_data)
     # print('apply_clicked = ', apply_clicked)
 

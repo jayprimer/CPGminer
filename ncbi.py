@@ -133,6 +133,9 @@ class NCBIdata:
         self.tax_items = {}
         self.filters = {}
 
+        self.genome_df = None
+        self.filtered_df = None
+        
         self.cache_path = './cache'
 
         self.size_menus = { 
@@ -252,12 +255,12 @@ class NCBIdata:
         genome_df = genome_df.drop(['Status'], axis = 1) # remove the column "Status"
         genome_df = genome_df.rename(columns={"#Organism/Name": "Genome Name"}) # change the first column name
  
-        self.genome_df = self.count_chro_plas(genome_df)
-        self.genome_df = self.making_final_df(self.genome_df)
-        self.genome_df = self.genome_df.dropna()  # remove missing values
+        genome_df = self.count_chro_plas(genome_df)
+        genome_df = self.making_final_df(genome_df)
+        genome_df = genome_df.dropna()  # remove missing values
 
-        self.genome_df = self.genome_df.reset_index()
-        return self.genome_df
+        genome_df = genome_df.reset_index()
+        return genome_df
 
     def load(self):
         self.genome_df = self.load_from_cache()
@@ -370,30 +373,31 @@ class NCBIdata:
     def apply_filter(self):
         # apply Taxonomic Ranks first
         print('applying filter...')
-        self.filtered_df = self.genome_df
+        if self.genome_df is not None:
+            self.filtered_df = self.genome_df
 
-        tax_filter = self.filters['Taxonomic Ranks']
-        if tax_filter and ('values' in tax_filter): 
-            print(tax_filter)
-            if tax_filter['values']:
-                print('applying taxonomic ranks', tax_filter)
+            tax_filter = self.filters['Taxonomic Ranks']
+            if tax_filter and ('values' in tax_filter): 
+                print(tax_filter)
+                if tax_filter['values']:
+                    print('applying taxonomic ranks', tax_filter)
 
-                self.filtered_df = self.genome_df.loc[self.genome_df[tax_filter['menu']].isin(tax_filter['values'])]
+                    self.filtered_df = self.genome_df.loc[self.genome_df[tax_filter['menu']].isin(tax_filter['values'])]
 
-                print('filtered', self.filtered_df.shape)
-                print(self.filtered_df.tail())
+                    print('filtered', self.filtered_df.shape)
+                    print(self.filtered_df.tail())
 
-        for title, filter in self.filters.items():
-            if 'checked' in filter and filter['checked']:
-                col_name = filter['col_name']
-                filter_values = filter['values']
-                
-                self.filtered_df = self.filtered_df.loc[
-                    self.filtered_df[col_name].between(filter_values[0], filter_values[1], inclusive='both') 
-                ]
-        
-        print('filtered', self.filtered_df.shape)
-        print(self.filtered_df.tail())
+            for title, filter in self.filters.items():
+                if 'checked' in filter and filter['checked']:
+                    col_name = filter['col_name']
+                    filter_values = filter['values']
+                    
+                    self.filtered_df = self.filtered_df.loc[
+                        self.filtered_df[col_name].between(filter_values[0], filter_values[1], inclusive='both') 
+                    ]
+            
+            print('filtered', self.filtered_df.shape)
+            print(self.filtered_df.tail())
 
 
     
