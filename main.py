@@ -62,7 +62,7 @@ def create_sidebar(ncbi_data):
     # return clicked
     
 
-@st.cache(allow_output_mutation=True) 
+# @st.cache(allow_output_mutation=True) 
 def initialize_data():
     pd.set_option('mode.chained_assignment', None)
 

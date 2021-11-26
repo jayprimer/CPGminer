@@ -135,7 +135,7 @@ class NCBIdata:
 
         self.genome_df = None
         self.filtered_df = None
-        
+
         self.cache_path = './cache'
 
         self.size_menus = { 
@@ -340,6 +340,7 @@ class NCBIdata:
         # OK_df = final_genome_df.style.format({'Genome download (FTP Path)': make_clickable})
         
         ## str to numeric data of the columns or number to str
+        final_genome_df['Genome size (Mb)'] = pd.to_numeric(final_genome_df['Genome size (Mb)'], errors='coerce') 
         final_genome_df['GC%'] = pd.to_numeric(final_genome_df['GC%'], errors='coerce') 
         final_genome_df['Genes'] = pd.to_numeric(final_genome_df['Genes'], errors='coerce') 
         final_genome_df['Proteins'] = pd.to_numeric(final_genome_df['Proteins'], errors='coerce')
