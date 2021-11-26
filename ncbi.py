@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
-import pprintpp as pp
+import pprint
 from ete3 import NCBITaxa
 import base64
 import re
+from datetime import date
+import os
+import numpy as np
 
 def change_ftp(ftp_path):
     '''
@@ -130,31 +133,141 @@ class NCBIdata:
         self.tax_items = {}
         self.filters = {}
 
-    def load(self):
-        data = pd.read_table(self.url, usecols=self.column_names)  # the column 15: Status
-        print(data)
-        complete_genomes = data.loc[data['Status'] == "Complete Genome"]    # Select only complete genomes
-        genome_df = complete_genomes.reset_index(drop = True) # reset index from 0
-        genome_df = genome_df.drop(['Status'], axis = 1) # remove the column "Status"
-        genome_df = genome_df.rename(columns={"#Organism/Name": "Genome Name"}) # change the first column name
-        self.genome_df = genome_df
-        return self.genome_df
+        self.cache_path = './cache'
 
-    def load_old(self):
-        data = pd.read_table(self.url, usecols=self.column_names)  # the column 15: Status
-        print(data)
+        self.size_menus = { 
+            'Genome Size': {
+                'menu': 'Genome Size',
+                'title': 'Select a range of Genome Size (Mb)',
+                'col_name': 'Genome size (Mb)',
+                },
+            'No. of Chromosome': {
+                'menu': 'No. of Chromosome',
+                'title': 'Select a range of No. of Chromosome',
+                'col_name': 'Chromosome',
+                },
+            'No. of Plasmid': {
+                'menu': 'No. of Plasmid',
+                'title': 'Select a range of No. of Plasmid',
+                'col_name': 'Plasmid',
+                },
+            'GC%': {
+                'menu': 'GC%',
+                'title': 'Select a range of GC%',
+                'col_name': 'GC%',
+                },
+            'No. of Genes': {
+                'menu': 'No. of Genes',
+                'title': 'Select a range of No. of Genes',
+                'col_name': 'Genes',
+                },
+            'No. of Proteins': {
+                'menu': 'No. of Proteins',
+                'title': 'Select a range of No. of Proteins',
+                'col_name': 'Proteins',
+                },
+       }
+
+    def get_cache_filename(self):
+        today = date.today()
+
+        filename = 'genome_df' + today.strftime("-%Y-%m-%d") + ".feather"
+        return os.path.join(self.cache_path, filename)
+
+    def save_to_cache(self, overwrite=False): 
+        cache_file = self.get_cache_filename()
+        if (not os.path.exists(cache_file)) or (os.path.exists(cache_file) and overwrite):
+            if not os.path.exists(self.cache_path):
+                os.makedirs(self.cache_path)
+            self.genome_df.to_feather(cache_file)
+
+    def load_from_cache(self):
+        cache_file = self.get_cache_filename()
+        if os.path.exists(cache_file):
+            print('load from cache...')
+            genome_df = pd.read_feather(cache_file)
+            genome_df.set_index('index', inplace=True)
+            return genome_df
+        else:
+            return None
+    
+    def save_df(self, df, filename): 
+        filepath = os.path.join(self.cache_path, filename + '.feather')
+        df.to_feather(filepath)
+    
+    def load_df(self, filename):
+        filepath = os.path.join(self.cache_path, filename + '.feather')
+        df = pd.read_feather(filepath)
+        try:
+            df.set_index('index', inplace=True)
+        except:
+            pass
+
+        return df
+
+
+    def processing(self):
+
+        data = self.load_df('original')
         complete_genomes = data.loc[data['Status'] == "Complete Genome"]    # Select only complete genomes
         genome_df = complete_genomes.reset_index(drop = True) # reset index from 0
         genome_df = genome_df.drop(['Status'], axis = 1) # remove the column "Status"
         genome_df = genome_df.rename(columns={"#Organism/Name": "Genome Name"}) # change the first column name
-    
+        self.save_df(genome_df.reset_index(), 'step1')
+
+        self.genome_df = self.count_chro_plas(genome_df)
+        self.save_df(self.genome_df.reset_index(), 'step2')
         
+        self.genome_df = self.making_final_df(self.genome_df)
+        self.save_df(self.genome_df.reset_index(), 'step3')
+
+        self.genome_df = self.genome_df.dropna()  # remove missing values
+        self.save_df(self.genome_df.reset_index(), 'step4')
+
+        self.calc_tax_items()
+        self.save_df(self.genome_df.reset_index(), 'step5')
+
+
+    def load_from_ncbi(self):
+        print('load from ncbi...')
+        dtype_data = {
+            '#Organism/Name':np.string_, 
+            'TaxID':np.string_, 
+            'Size (Mb)':np.string_, 
+            'GC%':np.string_, 
+            'Replicons':np.string_, 
+            'Genes':np.string_,
+            'Proteins':np.string_, 
+            'Release Date':np.string_, 
+            'Status':np.string_, 
+            'FTP Path':np.string_
+        }
+        data = pd.read_table(self.url, usecols=self.column_names, dtype=dtype_data)
+        # print(data.shape)
+        # print(data.columns)
+        # self.save_df(data, 'original')
+        
+        complete_genomes = data.loc[data['Status'] == "Complete Genome"]    # Select only complete genomes
+        genome_df = complete_genomes.reset_index(drop = True) # reset index from 0
+        genome_df = genome_df.drop(['Status'], axis = 1) # remove the column "Status"
+        genome_df = genome_df.rename(columns={"#Organism/Name": "Genome Name"}) # change the first column name
+ 
         self.genome_df = self.count_chro_plas(genome_df)
         self.genome_df = self.making_final_df(self.genome_df)
         self.genome_df = self.genome_df.dropna()  # remove missing values
 
-        self.calc_tax_items()
+        self.genome_df = self.genome_df.reset_index()
+        return self.genome_df
 
+    def load(self):
+        self.genome_df = self.load_from_cache()
+        if self.genome_df is None:
+            self.genome_df = self.load_from_ncbi()
+            self.save_to_cache()
+        
+        # perform processing for this class
+        self.calc_tax_items()
+        self.calc_range_for_size_menus()
         return self.genome_df
 
     def calc_tax_items(self):
@@ -162,6 +275,11 @@ class NCBIdata:
             self.tax_items[item_text] = list(set(self.genome_df[item_text]))
             self.tax_items[item_text] = list(filter(None, self.tax_items[item_text]))
             self.tax_items[item_text].sort()
+    
+    def calc_range_for_size_menus(self):
+        for title, menu in self.size_menus.items():
+            (min_v, max_v) = self.get_range(self.genome_df, menu['col_name'])
+            menu['range'] = (min_v, max_v)
 
     def get_range(self, df, col_name):
         min_value = float(df[col_name].min())
@@ -230,9 +348,53 @@ class NCBIdata:
 
     def setFilter(self, key, value):
         self.filters[key] = value
+        pprint.pprint(self.filters)
+        self.apply_filter()
 
     def __repr__(self):
-        return pp.pformat(self.filters)
+        # return pp.pformat(self.filters)
+        return str(self.filters)
+
+
+    def is_filter(self):
+        """
+        return true if filter is set
+        """
+        for title, filter in self.filters.items():
+            if title == 'Taxonomic Ranks':
+                if filter['values']: 
+                    return True
+            elif 'checked' in filter and filter['checked']:
+                return True
+                
+    def apply_filter(self):
+        # apply Taxonomic Ranks first
+        print('applying filter...')
+        self.filtered_df = self.genome_df
+
+        tax_filter = self.filters['Taxonomic Ranks']
+        if tax_filter and ('values' in tax_filter): 
+            print(tax_filter)
+            if tax_filter['values']:
+                print('applying taxonomic ranks', tax_filter)
+
+                self.filtered_df = self.genome_df.loc[self.genome_df[tax_filter['menu']].isin(tax_filter['values'])]
+
+                print('filtered', self.filtered_df.shape)
+                print(self.filtered_df.tail())
+
+        for title, filter in self.filters.items():
+            if 'checked' in filter and filter['checked']:
+                col_name = filter['col_name']
+                filter_values = filter['values']
+                
+                self.filtered_df = self.filtered_df.loc[
+                    self.filtered_df[col_name].between(filter_values[0], filter_values[1], inclusive='both') 
+                ]
+        
+        print('filtered', self.filtered_df.shape)
+        print(self.filtered_df.tail())
+
 
     
 
