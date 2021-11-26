@@ -1,7 +1,6 @@
 from numpy.lib.function_base import select
 import streamlit as st
 import pandas as pd
-import pprintpp as pp
 from ncbi import NCBIdata, download_link, count_tableMaker_groupby
 from datetime import date
 import base64

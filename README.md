@@ -8,3 +8,7 @@ Complete Prokaryote Genome Metadata Explorer
 ## Conda
 
 ```pip list --format=freeze > requirements.txt```
+
+## Run Streamlit
+
+```streamlit run main.py```
