@@ -103,7 +103,7 @@ def analysis_descriptive(ncbi_df):
     ## Data 2: Descriptive statistics of genomes
     st.header('Descriptive Statistics')
     graph_menu = ['Genome size (Mb)', 'Chromosome', 'Plasmid', 'GC%', 'Genes', 'Proteins']
-    graph_choice = st.selectbox('Boxplot data of genome size, No. of chromosome, plasmid, gene, and protein, and GC%', graph_menu, key = 1, index = 0)
+    graph_choice = st.selectbox('Boxplot data of genome size, No. of chromosome, plasmid, gene, and protein, and GC%', graph_menu, key = 'descriptive_selectbox', index = 0)
     
     with st.spinner('Please wait...'):
         if graph_choice == 'Select one':
@@ -136,17 +136,15 @@ def analysis_descriptive(ncbi_df):
 def analysis_heatmap(ncbi_df):
     ## Data 3: Descriptive statistics of genomes (scatter plot)
     st.header('Pearson Correlation Heatmap')
-    # st.write('<For a 3d scatter plot, please select three values>')
-    # st.write('Pearson correlation heatmap')
     fig, ax = plt.subplots()
-    corrMatrix = ncbi_df.iloc[:, 0:-1].corr()
+    corrMatrix = ncbi_df.iloc[:, 0:-1].corr(numeric_only=True)
     sns.heatmap(corrMatrix, annot=True, cmap='BrBG')
     st.pyplot(fig)
     
 def analysis_scatterplot(ncbi_df):
-    st.header('Scatter plot [2d or 3d])')
+    st.header('Scatter plot [2d or 3d]')
     scatter_items = ['Genome size (Mb)', 'Chromosome','Plasmid','GC%', 'Genes', 'Proteins']
-    scatter_items_selected = st.multiselect('Select 2 or 3 items', scatter_items, key = 1, default=['Genome size (Mb)', 'GC%'])
+    scatter_items_selected = st.multiselect('Select 2 or 3 items', scatter_items, key = 'scatter', default=['Genome size (Mb)', 'GC%'])
     # print(type(scatter_items_selected))
     
     if 0 <= len(scatter_items_selected) < 2:
@@ -164,7 +162,7 @@ def analysis_section4(ncbi_df):
     st.header('Distribution by Taxonomic Groups')
     # st.write('<Table data>')        
     df_menu = ['TaxID', 'Superkingdom','Phylum', 'Class', 'Order', 'Family', 'Genus','Species']
-    df_choice = st.selectbox('Select one item', df_menu, key = 5, index = 7)
+    df_choice = st.selectbox('Select one item', df_menu, key = 'descriptive4_selectbox', index = 7)
     
     try:
         if df_choice == 'Select data':
@@ -176,7 +174,7 @@ def analysis_section4(ncbi_df):
             st.dataframe(TaxID_df.style.highlight_max(axis=0))
             
             # ## download table data
-            if st.button('Download the selected complete genome data as CSV', key = 23):
+            if st.button('Download the selected complete genome data as CSV', key = 'descriptive4_download_taxid'):
                 tmp_download_link = download_link(TaxID_df, 'selectGenome_{}_count.csv'.format(df_choice), 'Click here to download your data!')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             
@@ -187,7 +185,7 @@ def analysis_section4(ncbi_df):
             st.dataframe(Superkingdom_df.style.highlight_max(axis=0))
             
             # ## download table data
-            if st.button('Download the selected complete genome data as CSV', key = 23):
+            if st.button('Download the selected complete genome data as CSV', key = 'descriptive4_download_superkingdom'):
                 tmp_download_link = download_link(Superkingdom_df, 'selectGenome_{}_count.csv'.format(df_choice), 'Click here to download your data!')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
         
@@ -196,7 +194,7 @@ def analysis_section4(ncbi_df):
             st.write(Taxlank_df_dsend_reindex.style.highlight_max(axis=0))
             
             # ## download table data
-            if st.button('Download the selected complete genome data as CSV', key = 23):
+            if st.button('Download the selected complete genome data as CSV', key = 'descriptive4_download_phylum'):
                 tmp_download_link = download_link(Taxlank_df_dsend_reindex, 'selectGenome_{}_count.csv'.format(df_choice), 'Click here to download your data!')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)        
         
@@ -205,7 +203,7 @@ def analysis_section4(ncbi_df):
             st.write(Taxlank_df_dsend_reindex.style.highlight_max(axis=0))
             
             # ## download table data
-            if st.button('Download the selected complete genome data as CSV', key = 23):
+            if st.button('Download the selected complete genome data as CSV', key = 'descriptive4_download_class'):
                 tmp_download_link = download_link(Taxlank_df_dsend_reindex, 'selectGenome_{}_count.csv'.format(df_choice), 'Click here to download your data!')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             
@@ -214,7 +212,7 @@ def analysis_section4(ncbi_df):
             st.write(Taxlank_df_dsend_reindex.style.highlight_max(axis=0))
             
             # ## download table data
-            if st.button('Download the selected complete genome data as CSV', key = 23):
+            if st.button('Download the selected complete genome data as CSV', key = 'descriptive4_download_order'):
                 tmp_download_link = download_link(Taxlank_df_dsend_reindex, 'selectGenome_{}_count.csv'.format(df_choice), 'Click here to download your data!')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             
@@ -223,7 +221,7 @@ def analysis_section4(ncbi_df):
             st.write(Taxlank_df_dsend_reindex.style.highlight_max(axis=0))
             
             # ## download table data
-            if st.button('Download the selected complete genome data as CSV', key = 23):
+            if st.button('Download the selected complete genome data as CSV', key = 'descriptive4_download_family'):
                 tmp_download_link = download_link(Taxlank_df_dsend_reindex, 'selectGenome_{}_count.csv'.format(df_choice), 'Click here to download your data!')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             
@@ -232,7 +230,7 @@ def analysis_section4(ncbi_df):
             st.write(Taxlank_df_dsend_reindex.style.highlight_max(axis=0))
             
             # ## download table data
-            if st.button('Download the selected complete genome data as CSV', key = 23):
+            if st.button('Download the selected complete genome data as CSV', key = 'descriptive4_download_genus'):
                 tmp_download_link = download_link(Taxlank_df_dsend_reindex, 'selectGenome_{}_count.csv'.format(df_choice), 'Click here to download your data!')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             
@@ -241,7 +239,7 @@ def analysis_section4(ncbi_df):
             st.write(Taxlank_df_dsend_reindex.style.highlight_max(axis=0))
             
             # ## download table data
-            if st.button('Download the selected complete genome data as CSV', key = 23):
+            if st.button('Download the selected complete genome data as CSV', key = 'descriptive4_download_species'):
                 tmp_download_link = download_link(Taxlank_df_dsend_reindex, 'selectGenome_{}_count.csv'.format(df_choice), 'Click here to download your data!')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
     except:
@@ -278,21 +276,12 @@ def main():
     ## No. of genomes
     (no_genomes, no_columns) = ncbi_df.shape
     st.write(f'**Data sourece:** GenBank prokaryotes.txt file downloaded **_{d1}_** **(a total of {no_genomes} completed genomes) (https://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS/)**')
-    
-    # if st.checkbox('Show raw prokaryote genome table (5 genomes only) and download all genome table'):
-    #     st.dataframe(ncbi_df.head())
-                
-    #     if st.button('Download complete genome data as CSV', key = 1):
-    #         tmp_download_link = download_link(ncbi_df, 'Genome_infor.csv', 'Click here to download your data!')
-    #         st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-    
+        
     st.write('')
     st.write('')
 
     display_filters(ncbi_data)
-
-        
+ 
 
     analysis_num_submission(ncbi_data.filtered_df)
     analysis_descriptive(ncbi_data.filtered_df)

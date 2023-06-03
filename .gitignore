@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 condaenv/
 cache/
+venv/
 
 # C extensions
 *.so

@@ -5,7 +5,7 @@ import plotly.express as px
 import seaborn as sns
 
 
-@st.cache(allow_output_mutation=True)    
+@st.cache_data(persist="disk")  
 def barchart_maker(dataframe, column_name):
     '''
     Function to make a input dataframe for barchart plotting of genomic data
@@ -28,7 +28,7 @@ def barchart_maker(dataframe, column_name):
         column_index_df = column_name_df.set_index(column_name)
         return column_index_df
 
-@st.cache(allow_output_mutation=True) 
+@st.cache_data(persist="disk")
 def boxplot_maker(graph_choice, genome_dataframe):
     
     '''
@@ -39,7 +39,7 @@ def boxplot_maker(graph_choice, genome_dataframe):
     fig = px.box(genome_dataframe, y=graph_choice, points='all')
     return fig
 
-@st.cache(allow_output_mutation=True) 
+@st.cache_data(persist="disk")
 def scatterplot_maker(scatter_items_selected, genome_dataframe):
     '''
     Function to draw a boxplot of the genomic features selected
@@ -57,7 +57,7 @@ def scatterplot_maker(scatter_items_selected, genome_dataframe):
         fig = px.scatter_3d(genome_dataframe, x=scatter_items_selected[0], y=scatter_items_selected[1], z=scatter_items_selected[2], opacity=0.5)
         return fig
     
-@st.cache(allow_output_mutation=True) 
+@st.cache_data(persist="disk")
 def scatterplot_maker_3(scatter_items_selected, genome_dataframe):
     '''
     Function to draw a boxplot of the genomic features selected

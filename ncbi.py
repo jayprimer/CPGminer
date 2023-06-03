@@ -18,7 +18,7 @@ def change_ftp(ftp_path):
     return new_ftp_path
 
 ## download data
-@st.cache(allow_output_mutation=True)
+@st.cache_data(persist="disk")
 def download_link(object_to_download, download_filename, download_link_text):
     """
     Generates a link to download the given object_to_download.
@@ -40,7 +40,7 @@ def download_link(object_to_download, download_filename, download_link_text):
 
     return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
 
-@st.cache(allow_output_mutation=True)    
+@st.cache_data(persist="disk")
 def count_tableMaker_groupby (Taxlank, genome_df):
 
     '''
@@ -70,7 +70,7 @@ def count_tableMaker_groupby (Taxlank, genome_df):
     Taxlank_df_dsend_reindex = Taxlank_df_dsend.reset_index(drop=True)
     return Taxlank_df_dsend_reindex
 
-@st.cache(allow_output_mutation=True) 
+@st.cache_data(persist="disk")
 def get_desired_ranks(taxid, desired_ranks):
     '''
     function to get taxonomical information from taxID
@@ -101,7 +101,7 @@ def get_desired_ranks(taxid, desired_ranks):
         count = 1
     return (lineage_list, count)
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data(persist="disk")
 def taxID_lineage_df(taxids, desired_ranks):
     '''
     Function to make a taxonomical information dtatframe of taxids
