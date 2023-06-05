@@ -1,35 +1,59 @@
-# GenomeMetaExplorer
-Complete Prokaryote Genome Metadata Explorer
+# Complete Prokaryote Genome (CPG) Metadata Explorer
+Complete Prokaryote Genome (CPG) Metadata Explorer is a Python application that provides an interactive dashboard for Complete Prokaryote Genomes (CPGs). It's designed to offer an easy way for researchers to inspect and analyze genome features and taxonomy, promoting greater understanding and facilitating improved data-driven decisions in genome research and education.
 
-## Clone
+## Getting Started
+These instructions will get you a copy of the project up and running on your local machine.
 
-```git clone ```
+### Prerequisites
+- Python (version 3.7 or above)
+- pip (Python package installer)
 
+## Clone the repository
+Clone the project to your machine:
 
-## Virtual Environment
+```bash
+git clone git@github.com:jayprimer/GenomeMetaExplorer.git
+```
 
-### Create an environment
-```python -m venv ./venv```
+## Setting Up a Virtual Environment
+To isolate your project and manage its dependencies, it's recommended to create a virtual environment.
 
-### Activate an environment
-```source ./venv/bin/activate```
+### Create a virtual environment
+Navigate to the project directory and run the following command to create a new virtual environment:
 
-### Deactivate
-```deactivate```
+```bash 
+python -m venv ./venv
+```
+
+### Activate the virtual environment
+Activate the virtual environment using the following command:
+
+```bash
+source ./venv/bin/activate
+```
+
+### Deactivate the virtual environment
+When you're done working on the project, you can deactivate the virtual environment:
+```bash
+deactivate
+```
 
 
 ## Installation
+Once you have cloned the repository and activated your virtual environment, navigate to the project directory and install the required dependencies using pip:
 
-```pip install -r requirements.txt```
+```bash
+pip install -r requirements.txt
+```
 
-## Test 
+## Running the Application
+This application uses Streamlit to provide a user-friendly interface. After the installation of dependencies, you can run the application with the following command:
 
-```python -m unittest tests.test_ncbi```
+```bash
+streamlit run main.py
+```
 
-## Conda
+This command starts the Streamlit server and you can interact with the application by opening your web browser to http://localhost:8501.
 
-```pip list --format=freeze > requirements.txt```
-
-## Run Streamlit
-
-```streamlit run main.py```
+## License
+This project is licensed under the MIT License - see the LICENSE.md file for details.
