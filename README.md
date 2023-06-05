@@ -14,7 +14,7 @@ These instructions will get you a copy of the project up and running on your loc
 Clone the project to your machine:
 
 ```bash
-git clone git@github.com:jayprimer/GenomeMetaExplorer.git
+git clone git@github.com:jayprimer/CPGMetadataExplorer.git
 ```
 
 ## Setting Up a Virtual Environment
