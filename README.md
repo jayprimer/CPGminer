@@ -1,3 +1,5 @@
+![Complete Prokaryote Genome (CPG) Metadata Explorer](/images/Picture7.png)
+
 # Complete Prokaryote Genome (CPG) Metadata Explorer
 Complete Prokaryote Genome (CPG) Metadata Explorer is a Python application that provides an interactive dashboard for Complete Prokaryote Genomes (CPGs). It's designed to offer an easy way for researchers to inspect and analyze genome features and taxonomy, promoting greater understanding and facilitating improved data-driven decisions in genome research and education.
 
