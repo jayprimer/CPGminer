@@ -13,7 +13,7 @@ from charts import barchart_maker, boxplot_maker, scatterplot_maker, scatterplot
 def create_sidebar(ncbi_data):
     print('sidebar rendering started...')
 
-    st.sidebar.image('./images/CPGlogo2.png')
+    st.sidebar.image('./images/CPGlogo1.png')
 
     # Taxonomic Ranks
     first_menu = 'Taxonomic Ranks'
@@ -251,7 +251,7 @@ def main():
     st.set_page_config(page_title="CPGminer", page_icon="./images/CPGFav.png")
     
     # Main Logo
-    st.image('./images/CPGlogo1.png', use_column_width=True)
+    st.image('./images/CPGlogo2.png', use_column_width=True)
     
 
 
