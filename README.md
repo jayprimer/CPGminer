@@ -1,4 +1,4 @@
-![CPGminer: Complete Prokaryote Genome (CPG) Metadata Dashboard](/images/CPGlogo1.png)
+![CPGminer: Complete Prokaryote Genome (CPG) Metadata Dashboard](/images/CPGlogo2.png)
 
 # CPGminer: Complete Prokaryote Genome (CPG) Metadata Dashboard
 CPGminer is a Python application that provides an interactive dashboard for Complete Prokaryote Genome (CPG) metadata. It's designed to offer an easy way to inspect and analyze genome features and taxonomy, promoting greater understanding and facilitating improved data-driven decisions in genome research and education.
