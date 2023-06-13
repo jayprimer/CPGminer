@@ -1,7 +1,7 @@
-![Complete Prokaryote Genome (CPG) Metadata Explorer](/images/Picture7.png)
+![CPGminer: Complete Prokaryote Genome (CPG) Metadata Dashboard](/images/CPGlogo1.png)
 
-# Complete Prokaryote Genome (CPG) Metadata Explorer
-Complete Prokaryote Genome (CPG) Metadata Explorer is a Python application that provides an interactive dashboard for Complete Prokaryote Genomes (CPGs). It's designed to offer an easy way for researchers to inspect and analyze genome features and taxonomy, promoting greater understanding and facilitating improved data-driven decisions in genome research and education.
+# CPGminer: Complete Prokaryote Genome (CPG) Metadata Dashboard
+CPGminer is a Python application that provides an interactive dashboard for Complete Prokaryote Genome (CPG) metadata. It's designed to offer an easy way to inspect and analyze genome features and taxonomy, promoting greater understanding and facilitating improved data-driven decisions in genome research and education.
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine.
@@ -14,7 +14,7 @@ These instructions will get you a copy of the project up and running on your loc
 Clone the project to your machine:
 
 ```bash
-git clone git@github.com:jayprimer/GenomeMetaExplorer.git
+git clone git@github.com:jayprimer/CPGminer.git
 ```
 
 ## Setting Up a Virtual Environment

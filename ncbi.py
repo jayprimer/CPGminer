@@ -144,29 +144,29 @@ class NCBIdata:
                 'title': 'Select a range of Genome Size (Mb)',
                 'col_name': 'Genome size (Mb)',
                 },
-            'No. of Chromosome': {
-                'menu': 'No. of Chromosome',
-                'title': 'Select a range of No. of Chromosome',
-                'col_name': 'Chromosome',
-                },
-            'No. of Plasmid': {
-                'menu': 'No. of Plasmid',
-                'title': 'Select a range of No. of Plasmid',
-                'col_name': 'Plasmid',
-                },
             'GC%': {
                 'menu': 'GC%',
                 'title': 'Select a range of GC%',
                 'col_name': 'GC%',
                 },
-            'No. of Genes': {
-                'menu': 'No. of Genes',
-                'title': 'Select a range of No. of Genes',
+            'Number of Chromosomes': {
+                'menu': 'Number of Chromosomes',
+                'title': 'Select a range of number of Chromosomes',
+                'col_name': 'Chromosome',
+                },
+            'Number of Plasmids': {
+                'menu': 'Number of Plasmids',
+                'title': 'Select a range of number of Plasmids',
+                'col_name': 'Plasmid',
+                },
+            'Number of Genes': {
+                'menu': 'Number of Genes',
+                'title': 'Select a range of number of Genes',
                 'col_name': 'Genes',
                 },
-            'No. of Proteins': {
-                'menu': 'No. of Proteins',
-                'title': 'Select a range of No. of Proteins',
+            'Number of Proteins': {
+                'menu': 'Number of Proteins',
+                'title': 'Select a range of number of Proteins',
                 'col_name': 'Proteins',
                 },
        }

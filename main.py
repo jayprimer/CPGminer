@@ -12,7 +12,8 @@ from charts import barchart_maker, boxplot_maker, scatterplot_maker, scatterplot
 
 def create_sidebar(ncbi_data):
     print('sidebar rendering started...')
-    st.sidebar.image('./images/Picture10.png')
+
+    st.sidebar.image('./images/CPGlogo2.png')
 
     # Taxonomic Ranks
     first_menu = 'Taxonomic Ranks'
@@ -101,36 +102,36 @@ def analysis_num_submission(ncbi_df):
 
 def analysis_descriptive(ncbi_df):
     ## Data 2: Descriptive statistics of genomes
-    st.header('Descriptive Statistics')
-    graph_menu = ['Genome size (Mb)', 'Chromosome', 'Plasmid', 'GC%', 'Genes', 'Proteins']
-    graph_choice = st.selectbox('Boxplot data of genome size, No. of chromosome, plasmid, gene, and protein, and GC%', graph_menu, key = 'descriptive_selectbox', index = 0)
+    st.header('Box plot')
+    graph_menu = ['Genome size (Mb)', 'GC%', 'Number of Chromosomes', 'Number of Plasmids', 'Number of Genes', 'Number of Proteins']
+    graph_choice = st.selectbox('Select one', graph_menu, key = 'descriptive_selectbox', index = 0)
     
     with st.spinner('Please wait...'):
         if graph_choice == 'Select one':
             st.write('Please select a boxplot')
         
         elif graph_choice == 'GC%':
-            fig = boxplot_maker(graph_choice, ncbi_df)
+            fig = boxplot_maker('GC%', ncbi_df)
             st.plotly_chart(fig)
         
         elif graph_choice == 'Genome size (Mb)':
-            fig = boxplot_maker(graph_choice, ncbi_df)
+            fig = boxplot_maker('Genome size (Mb)', ncbi_df)
             st.plotly_chart(fig)
             
-        elif graph_choice == 'Chromosome':
-            fig = boxplot_maker(graph_choice, ncbi_df)
+        elif graph_choice == 'Number of Chromosomes':
+            fig = boxplot_maker('Chromosome', ncbi_df)
             st.plotly_chart(fig)
             
-        elif graph_choice == 'Plasmid':
-            fig = boxplot_maker(graph_choice, ncbi_df)
+        elif graph_choice == 'Number of Plasmids':
+            fig = boxplot_maker('Plasmid', ncbi_df)
             st.plotly_chart(fig)
                 
-        elif graph_choice == 'Genes':
-            fig = boxplot_maker(graph_choice, ncbi_df)
+        elif graph_choice == 'Number of Genes':
+            fig = boxplot_maker('Genes', ncbi_df)
             st.plotly_chart(fig)
             
-        elif graph_choice == 'Proteins':
-            fig = boxplot_maker(graph_choice, ncbi_df)
+        elif graph_choice == 'Number of Proteins':
+            fig = boxplot_maker('Proteins', ncbi_df)
             st.plotly_chart(fig)
 
 def analysis_heatmap(ncbi_df):
@@ -143,7 +144,7 @@ def analysis_heatmap(ncbi_df):
     
 def analysis_scatterplot(ncbi_df):
     st.header('Scatter plot [2d or 3d]')
-    scatter_items = ['Genome size (Mb)', 'Chromosome','Plasmid','GC%', 'Genes', 'Proteins']
+    scatter_items = ['Genome size (Mb)', 'GC%', 'Chromosome','Plasmid','Genes', 'Proteins']
     scatter_items_selected = st.multiselect('Select 2 or 3 items', scatter_items, key = 'scatter', default=['Genome size (Mb)', 'GC%'])
     # print(type(scatter_items_selected))
     
@@ -246,7 +247,13 @@ def analysis_section4(ncbi_df):
         st.write('Please select genome(s)')  
 
 def main():
-    st.image('./images/Picture7.png', use_column_width=True)
+    # Page Title/Favicon
+    st.set_page_config(page_title="CPGminer", page_icon="./images/CPGFav.png")
+    
+    # Main Logo
+    st.image('./images/CPGlogo1.png', use_column_width=True)
+    
+
 
     with st.spinner('Downloading data from NCBI...'):
         ncbi_data = initialize_data()
@@ -258,15 +265,25 @@ def main():
     print('page rendering started...')
 
     ## Introduction; reference; data sources; etc
-    with st.expander("See notes"):
+    with st.expander("How to use this app"):
 
         st.markdown("""
+        ## About
+        
         This app allows the user to easily access and explore the metadata of complete prokaryote genomes to support education and genome-based research.  
         
-        * **All complete prokaryte genomes**
-        * **Genome selection by taxonomic lineage**
-        * **Genome selection by numerical genomic features, including genome sieze, GC%, etc.**
+        * All complete prokaryte genomes
+        * Genome selection by taxonomic lineage
+        * Genome selection by numerical genomic features, including genome sieze, GC%, etc.
         
+        ## How to filter data using the left sidebar
+
+        * Select TaxID or taxonomic ranks
+        * Select corresponding subcategory items. You can select multiple items by keep clicking items.
+        * Check genome features (Genome Size, GC%, Number of Chromosomes, Plasmids, Genes, and Proteins) that you want to filter 
+        * Adjust slider values for the selected genome features
+        * Filtered data will be used to display tables and charts in the main page.
+
         """)
     
     ## Data 1: Date and the no. of genomes
@@ -285,8 +302,8 @@ def main():
 
     analysis_num_submission(ncbi_data.filtered_df)
     analysis_descriptive(ncbi_data.filtered_df)
-    analysis_heatmap(ncbi_data.filtered_df)
     analysis_scatterplot(ncbi_data.filtered_df)
+    analysis_heatmap(ncbi_data.filtered_df)
     analysis_section4(ncbi_data.filtered_df)
     
     print('page rendering complete.')
