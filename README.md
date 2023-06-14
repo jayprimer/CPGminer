@@ -30,8 +30,14 @@ python -m venv ./venv
 ### Activate the virtual environment
 Activate the virtual environment using the following command:
 
+For linux,
 ```bash
 source ./venv/bin/activate
+```
+
+For windows,
+```
+.\venv\Scripts\activate
 ```
 
 ### Deactivate the virtual environment
