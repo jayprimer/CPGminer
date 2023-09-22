@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 Download the release file (.zip):
 
-- [Win32-x64-1.0.0](https://github.com/jayprimer/CPGminer/releases/tag/win32-x64-1.0.0) : executable version (.exe) of CFGminer for windows. Unzip and run CFGminer.exe. Follow instructions in the command line prompt. You will see the dashboard open in your browser. 
+- [Win32-x64-1.0.0](https://github.com/jayprimer/CPGminer/releases/tag/win32-x64-1.0.0) : executable version (.exe) of CPGminer for windows. Unzip and run CPGminer.exe. Follow instructions in the command line prompt. You will see the dashboard open in your browser. 
 
 ### Install source codes locally
 
