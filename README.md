@@ -4,30 +4,38 @@
 CPGminer is a Python application that provides an interactive dashboard for Complete Prokaryote Genome (CPG) metadata. It's designed to offer an easy way to inspect and analyze genome features and taxonomy, promoting greater understanding and facilitating improved data-driven decisions in genome research and education.
 
 ## Getting Started
-These instructions will get you a copy of the project up and running on your local machine.
+These instructions will get you a copy of the project up and running on your local machine. You may choose to download the pre-built release file or you can install python source codes locally.
 
-### Prerequisites
+### Release 
+
+Download the release file (.zip):
+
+- [Win32-x64-1.0.0](https://github.com/jayprimer/CPGminer/releases/tag/win32-x64-1.0.0) : executable version (.exe) of CFGminer for windows. Unzip and run CFGminer.exe. Follow instructions in the command line prompt. You will see the dashboard open in your browser. 
+
+### Install source codes locally
+
+#### Prerequisites
 - Python (version 3.7 or above)
 - pip (Python package installer)
 
-## Clone the repository
+#### Clone the repository
 Clone the project to your machine:
 
 ```bash
 git clone git@github.com:jayprimer/CPGminer.git
 ```
 
-## Setting Up a Virtual Environment
+#### Setting Up a Virtual Environment
 To isolate your project and manage its dependencies, it's recommended to create a virtual environment.
 
-### Create a virtual environment
+##### Create a virtual environment
 Navigate to the project directory and run the following command to create a new virtual environment:
 
 ```bash 
 python -m venv ./venv
 ```
 
-### Activate the virtual environment
+##### Activate the virtual environment
 Activate the virtual environment using the following command:
 
 For linux,
@@ -40,21 +48,21 @@ For windows,
 .\venv\Scripts\activate
 ```
 
-### Deactivate the virtual environment
+##### Deactivate the virtual environment
 When you're done working on the project, you can deactivate the virtual environment:
 ```bash
 deactivate
 ```
 
 
-## Installation
+#### Installation
 Once you have cloned the repository and activated your virtual environment, navigate to the project directory and install the required dependencies using pip:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Running the Application
+#### Running the Application
 This application uses Streamlit to provide a user-friendly interface. After the installation of dependencies, you can run the application with the following command:
 
 ```bash
